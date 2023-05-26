@@ -29,68 +29,74 @@
 
 ======JS====== 
 // START: onclick delete data 
-$('#delete_btn').click(function(){
-    var id =[];
-    var csrf = $('input[name=csrfmiddlewaretoken]').val();
-    $('input[name=getselectedval]:checkbox:checked').each(function(i){
-        id[i]=$(this).val()
-    })
-    if(id.length===0){
-        Swal.fire({
-          position: 'top-end',
-          icon: 'error',
-          title: 'please select an item',
-          showConfirmButton: false,
-          timer: 500
-        });
-    }else{
-        Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url:"{% url 'echobuddy_expert_delete' %}",
-                method:"POST",
-                data:{
-                    id,
-                    csrfmiddlewaretoken:csrf
-                },
-                success: function (data) {
-                    if(data.status===true){
-                        d_icon = 'success'
-                    }else{
-                        d_icon = 'error'
-                    }
-                    Swal.fire({
-                    position: 'top-end',
-                    icon: d_icon,
-                    title: data.message,
-                    showConfirmButton: false,
-                    timer: 500
-                    });
-                    setTimeout(() => {location.reload();}, 500);
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    Swal.fire({
-                    position: 'top-end',
-                    icon: 'error',
-                    title: 'unable to delete',
-                    showConfirmButton: false,
-                    timer: 500
-                    });
-                    setTimeout(() => {location.reload();}, 500);
-                }
-            })                   
+$('#delete_btn').click(function() {
+  var id = [];
+  var csrf = $('input[name=csrfmiddlewaretoken]').val();
+  
+  $('input[name=getselectedval]:checkbox:checked').each(function() {
+    id.push($(this).val());
+  });
+  
+  if (id.length === 0) {
+    Swal.fire({
+      position: 'top-end',
+      icon: 'error',
+      title: 'Please select an item',
+      showConfirmButton: false,
+      timer: 500
+    });
+    return;
+  }
+  
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: "{% url 'echobuddy_expert_delete' %}",
+        method: "POST",
+        data: {
+          id: id,
+          csrfmiddlewaretoken: csrf
+        },
+        success: function(data) {
+          var d_icon = (data.status === true) ? 'success' : 'error';
+          
+          Swal.fire({
+            position: 'top-end',
+            icon: d_icon,
+            title: data.message,
+            showConfirmButton: false,
+            timer: 500
+          });
+          
+          setTimeout(() => {
+            location.reload();
+          }, 500);
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title: 'Unable to delete',
+            showConfirmButton: false,
+            timer: 500
+          });
+          
+          setTimeout(() => {
+            location.reload();
+          }, 500);
         }
-        })                    
+      });
     }
-})
+  });
+});
 // END: onclick delete data  
 
 ======URLS.PY====== 
